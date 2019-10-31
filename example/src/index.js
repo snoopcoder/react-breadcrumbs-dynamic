@@ -10,7 +10,7 @@ import { BreadcrumbsProvider } from '../../src';
 const app = (
   <BrowserRouter>
     <BreadcrumbsProvider>
-      <App/ >
+      <App  />
     </BreadcrumbsProvider>
   </BrowserRouter>
 )

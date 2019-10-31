@@ -47,19 +47,68 @@ const defaultCompare = (a, b) => (
   a[breadcrumbsBearingKey].length - b[breadcrumbsBearingKey].length
 )
 
+const defaultRender = (props) => {
+  const {
+    container: Container,
+    containerProps,
+    hideIfEmpty,
+    item: Item,
+    finalItem: FinalItem,
+    finalProps,
+    separator,
+    duplicate,
+    remove,
+    rename,
+    itemsValue,
+    count,
+    prepareItemProps,
+  } = props
+
+  if (hideIfEmpty && count === 0) {
+    return null
+  }
+
+  return (
+      <Container {...containerProps}>
+        {itemsValue.map((itemValue, i) => {
+          return i+1 < count ? (
+
+              separator ? (
+                  <span key={i}>
+              <Item {...prepareItemProps(itemValue)} />
+                    {separator}
+            </span>
+              ) : (
+                  <Item key={i} {...prepareItemProps(itemValue)} />
+              )
+
+          ) : (
+
+              <FinalItem key={i}
+                         {...prepareItemProps(itemValue)}
+                         {...finalProps}
+              />
+
+          )
+        })}
+
+      </Container>
+  )}
+
 const Breadcrumbs_ = (props) => {
   const {
-    container: Container = 'span',
+    container = 'span',
     containerProps,
     hideIfEmpty = false,
-    item: Item = 'a',
-    finalItem: FinalItem = Item,
+    item ='a',
+    finalItem = item,
     finalProps = {},
     separator,
     duplicateProps: duplicate = {},
     removeProps: remove  = {},
-    renameProps: rename = (Item === 'a' ? {to: 'href'} : {}),
-    compare
+    renameProps: rename = (item === 'a' ? {to: 'href'} : {}),
+    compare,
+    render = defaultRender
   } = props
   const data = props[breadcrumbsThroughArea]
   const itemsValue = Object
@@ -68,37 +117,14 @@ const Breadcrumbs_ = (props) => {
     .sort(compare || defaultCompare)
   const count = itemsValue.length
 
-  if (hideIfEmpty && count === 0) {
-    return null
+  function prepareItemProps(itemValue) {
+    return prepareProps(itemValue, rename, duplicate, remove)
   }
 
-  return (
-    <Container {...containerProps}>
-
-      {itemsValue.map((itemValue, i) => {
-        return i+1 < count ? (
-
-          separator ? (
-            <span key={i}>
-              <Item {...prepareProps(itemValue, rename, duplicate, remove)} />
-              {separator}
-            </span>
-          ) : (
-            <Item key={i} {...prepareProps(itemValue, rename, duplicate, remove)} />
-          )
-
-        ) : (
-
-          <FinalItem key={i}
-            {...prepareProps(itemValue, rename, duplicate, remove)}
-            {...finalProps}
-          />
-
-        )
-      })}
-
-    </Container>
-  )
+  return render({
+    count, itemsValue, finalItem, finalProps, separator, hideIfEmpty,
+    containerProps, container, prepareItemProps, item
+  })
 }
 
 export const Breadcrumbs = withBreadcrumbsContainer(Breadcrumbs_)

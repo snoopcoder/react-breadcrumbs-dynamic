@@ -3,6 +3,7 @@ const webpack = require('webpack');
 
 module.exports = {
     entry: './src/index.js',
+    devtool: "#inline-source-map",
     output: {
         path: path.resolve(__dirname, 'build'),
         publicPath: '/build/',
